@@ -2,12 +2,15 @@
 
 using NUnit.Framework;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Gameplay
 {
-    public class Hole: MonoBehaviour
+    public class Hole: OnBoardObject, IHole
     {
+        [SerializeField] TextMeshPro _remainText;
+
         [SerializeField] SheepColor _color;
         [SerializeField] Vector2Int[] shape;
         [SerializeField] Vector2Int _pivot;
@@ -58,6 +61,25 @@ namespace Gameplay
                 cells.Add(shape[i] + _pivot);
             }
             return cells;
+        }
+
+        public void OnSheepEnterHole()
+        {
+            remain--;
+
+            _remainText.text = remain.ToString();
+            if (remain == 0)
+                OnFullHole();
+        }
+
+        public void OnFullHole()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public bool IsFull()
+        {
+            return remain == 0;
         }
     }
 }

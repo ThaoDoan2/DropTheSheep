@@ -131,18 +131,22 @@ namespace Gameplay
                 {
                     direction.y = 0;
                     direction.x = direction.x > 0 ? 1 : -1;
-                } else
+                }
+                else
                 {
                     direction.x = 0;
                     direction.y = direction.y > 0 ? 1 : -1;
                 }
                 cellPos = _selectedHole.CellPos + direction;
-                    
+
                 if (CheckMoveValid(hole, cellPos) == false)
                     return;
-                
+
                 _selectedHole.SetCell(cellPos);
                 _selectedHole.transform.localPosition = GridToWorld(hole.Pivot.x, hole.Pivot.y);
+
+                bool isHoleFull = _selectedHole.IsFull();
+                _selectedHole.GetShapeCells().ForEach(pos => _cells[pos.x, pos.y].Type = isHoleFull ? CellType.Empty : CellType.Block);
             }
         }
 

@@ -12,7 +12,8 @@
         Pink = 6,
         Green = 7,
         Sky = 8,
-        Lime = 9
+        Lime = 9, 
+        Black = 10
     }
 
     public enum CellType

@@ -33,6 +33,7 @@ namespace Gameplay
 
             _boardRoot = new GameObject("Board").transform;
             _boardRoot.SetParent(transform);
+            _boardRoot.localPosition = Vector3.zero;
 
             for (int r = 0; r < rows; r++)
             {
@@ -207,6 +208,8 @@ namespace Gameplay
 
             for (int i = 0; i < newShape.Count; i++)
             {
+                if (newShape[i].x < 0 || newShape[i].x >= cols || newShape[i].y < 0 || newShape[i].y >= rows)
+                    return false;
                 Cell cell = _cells[newShape[i].x, newShape[i].y];
                 if (cell.Type == CellType.Block)
                     return false;
@@ -248,7 +251,7 @@ namespace Gameplay
         {
             for (int i = 0; i < _holes.Count; i++)
             {
-                if (_holes[i].IsAtCell(pos))
+                if (_holes[i].IsAtCell(pos) && _holes[i].IsActive())
                 {
                     return _holes[i];
                 }

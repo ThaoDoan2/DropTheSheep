@@ -88,6 +88,11 @@ namespace Gameplay
             return remain == 0;
         }
 
+        public bool IsActive()
+        {
+            return remain > 0;
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {

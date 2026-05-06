@@ -9,6 +9,7 @@ namespace Gameplay
 {
     public class Hole: OnBoardObject, IHole
     {
+        [SerializeField] SpriteRenderer[] _renderers;
         [SerializeField] TextMeshPro _remainText;
 
         [SerializeField] SheepColor _color;
@@ -95,6 +96,12 @@ namespace Gameplay
             remain = _shape.Length;
             if (_remainText != null)
                 _remainText.text = remain.ToString();
+
+            Color c = GameplaySO.instance.GetColor(_color);
+            foreach (var renderer in _renderers)
+            {
+                renderer.color = c;
+            }
         }
 #endif
     }

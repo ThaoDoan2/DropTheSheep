@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0, g: 0.69433475, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -104,4 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a67cbc6c14771a4eb0c9b38e72b3f9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Sheep
+  _cellPos: {x: 0, y: 0}
+  _board: {fileID: 0}
   _color: 3
+  _renderer: {fileID: 7520190732035060798}

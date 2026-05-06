@@ -12,24 +12,29 @@ namespace Gameplay
         [SerializeField] TextMeshPro _remainText;
 
         [SerializeField] SheepColor _color;
-        [SerializeField] Vector2Int[] shape;
-        [SerializeField] Vector2Int _pivot;
+        [SerializeField] Vector2Int[] _shape;
 
         Vector2Int _touchCell = Vector2Int.zero;
 
         int remain;
 
-        public Vector2Int Pivot => _pivot;
+        public Vector2Int Pivot => _cellPos;
 
-        public Vector2Int CellPos => _pivot + _touchCell;
+        public Vector2Int CellPos => _cellPos + _touchCell;
 
-        public SheepColor Color => _color;  
+        public SheepColor Color => _color;
+
+        private void Start()
+        {
+            remain = _shape.Length;
+            _remainText.text = remain.ToString();
+        }
 
         public bool IsAtCell(Vector2Int pos)
         {
-            for (int i = 0; i < shape.Length; i++)
+            for (int i = 0; i < _shape.Length; i++)
             {
-                if (shape[i] + _pivot == pos)
+                if (_shape[i] + _cellPos == pos)
                     return true;
 
             }
@@ -38,16 +43,16 @@ namespace Gameplay
 
         public void SetCell(Vector2Int pos)
         {
-            _pivot = pos - _touchCell;
+            _cellPos = pos - _touchCell;
         }
 
         public void Select(Vector2Int pos)
         {
-            for (int i = 0; i < shape.Length; i++)
+            for (int i = 0; i < _shape.Length; i++)
             {
-                if (shape[i] + _pivot == pos)
+                if (_shape[i] + _cellPos == pos)
                 {
-                    _touchCell = shape[i];
+                    _touchCell = _shape[i];
                     break;
                 }
             }
@@ -56,9 +61,9 @@ namespace Gameplay
         public List<Vector2Int> GetShapeCells()
         {
             List<Vector2Int> cells = new List<Vector2Int>();
-            for (int i = 0; i < shape.Length; i++)
+            for (int i = 0; i < _shape.Length; i++)
             {
-                cells.Add(shape[i] + _pivot);
+                cells.Add(_shape[i] + _cellPos);
             }
             return cells;
         }
@@ -81,5 +86,16 @@ namespace Gameplay
         {
             return remain == 0;
         }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+
+            remain = _shape.Length;
+            if (_remainText != null)
+                _remainText.text = remain.ToString();
+        }
+#endif
     }
 }

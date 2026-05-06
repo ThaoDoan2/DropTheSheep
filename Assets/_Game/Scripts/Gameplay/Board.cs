@@ -1,3 +1,4 @@
+using Qutility.CustomEditor;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,7 +26,6 @@ namespace Gameplay
             BuildGrid();
             LoadBoard();
         }
-
 
         private void BuildGrid()
         {
@@ -90,7 +90,6 @@ namespace Gameplay
             return new Vector2Int(c, r);
         }
 
-
         public void OnTouchBegan(Vector3 pos)
         {
             Log($"OnTouchBegan {pos}");
@@ -144,10 +143,56 @@ namespace Gameplay
 
                 _selectedHole.SetCell(cellPos);
                 _selectedHole.transform.localPosition = GridToWorld(hole.Pivot.x, hole.Pivot.y);
+                CheckSheepJumpToHole(_selectedHole);
 
                 bool isHoleFull = _selectedHole.IsFull();
-                _selectedHole.GetShapeCells().ForEach(pos => _cells[pos.x, pos.y].Type = isHoleFull ? CellType.Empty : CellType.Block);
+                if (isHoleFull)
+                {
+                    _selectedHole.OnFullHole();
+                    OnHoleFull(_selectedHole);
+                    EndMovement();
+
+                }
+                else
+                {
+                    _selectedHole.GetShapeCells().ForEach(pos => _cells[pos.x, pos.y].Type = CellType.Hole);
+                }
             }
+        }
+
+        private void EndMovement()
+        {
+            _selectedHole = null;
+        }
+
+        public void CheckSheepJumpToHole(Hole hole)
+        {
+            hole.GetShapeCells().ForEach(pos =>
+            {
+                Cell cell = _cells[pos.x, pos.y];
+                if (cell.Type == CellType.Sheep)
+                {
+                    var sheep = GetSheepAtCell(pos);
+                    if (sheep != null && sheep.Color == hole.Color
+                    && !hole.IsFull())
+                    {
+                        sheep.JumpToHole(hole);
+                        cell.Type = CellType.Hole;
+                    }
+                }
+            });
+        }
+
+        public void OnHoleFull(Hole hole)
+        {
+            hole.GetShapeCells().ForEach(pos =>
+            {
+                Cell cell = _cells[pos.x, pos.y];
+                if (cell.Type == CellType.Hole)
+                {
+                    cell.Type = CellType.Empty;
+                }
+            });
         }
 
         private bool CheckMoveValid(Hole hole, Vector2Int cellPos)
@@ -226,6 +271,18 @@ namespace Gameplay
         Sheep GetSheepAtCell(int c, int r)
         {
             return GetSheepAtCell(new Vector2Int(c, r));
+        }
+
+        [ButtonMethod]
+        public void LoadBoardState()
+        {
+            Sheep[] sheeps = GetComponentsInChildren<Sheep>();
+            _sheeps.Clear();
+            _sheeps.AddRange(sheeps);
+
+            Hole[] holes = GetComponentsInChildren<Hole>();
+            _holes.Clear();
+            _holes.AddRange(holes);
         }
 
         private static void Log(string msg)

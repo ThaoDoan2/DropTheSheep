@@ -2,11 +2,12 @@
 
 namespace Gameplay
 {
-    public class Sheep : MonoBehaviour
+    public class Sheep : OnBoardObject
     {
         [SerializeField] SheepColor _color;
-        [SerializeField] Vector2Int _cellPos;
-        [SerializeField] Board _board;
+
+        [SerializeField] SpriteRenderer _renderer;
+        
 
         public SheepColor Color => _color;
 
@@ -25,14 +26,12 @@ namespace Gameplay
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        protected override void OnValidate()
         {
-            if (_board == null)
-                _board = transform.GetComponentInParent<Board>();
-            if (_board == null)
-                return;
-            Vector3 pos = _board.GridToWorld(_cellPos.x, _cellPos.y);
-            transform.localPosition = pos;
+            base.OnValidate();
+            Color color = GameplaySO.instance.GetColor(_color);
+
+            _renderer.color = color;
         }
 #endif
     }

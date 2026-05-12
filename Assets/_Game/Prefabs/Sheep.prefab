@@ -49,6 +49,7 @@ MonoBehaviour:
   _board: {fileID: 0}
   _color: 3
   _renderer: {fileID: 4453910006242517308}
+  _sheepColorConst: {fileID: 11400000, guid: 57da52d2f24886d428d8357dc6520fb7, type: 2}
 --- !u!1 &8216681097226178712
 GameObject:
   m_ObjectHideFlags: 0

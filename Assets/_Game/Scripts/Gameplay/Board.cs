@@ -46,6 +46,12 @@ namespace Gameplay
                     cell.Init(c, r);
                     cell.transform.SetParent(_boardRoot);
                     _cells[c, r] = cell;
+
+                    bool left = c > 0;
+                    bool right = c < cols - 1;
+                    bool top = r < rows - 1;
+                    bool bottom = r > 0;
+                    cell.UpdateCell(left, top, right, bottom);
                 }
             }
         }

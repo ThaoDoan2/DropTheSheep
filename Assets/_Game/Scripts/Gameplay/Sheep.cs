@@ -7,6 +7,7 @@ namespace Gameplay
         [SerializeField] SheepColor _color;
 
         [SerializeField] SpriteRenderer _renderer;
+        [SerializeField] SheepColorConst _sheepColorConst;
         
 
         public SheepColor Color => _color;
@@ -29,7 +30,7 @@ namespace Gameplay
         protected override void OnValidate()
         {
             base.OnValidate();
-            Color color = GameplaySO.instance.GetColor(_color);
+            Color color = _sheepColorConst.GetColor(_color);
 
             _renderer.color = color;
         }

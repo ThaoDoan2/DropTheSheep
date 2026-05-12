@@ -10,6 +10,9 @@ public class GameplaySO : ScriptableSingleton<GameplaySO>
     public Color GetColor(SheepColor sheepColor)
     {
         Debug.Log($"GetColor {sheepColor}");
-        return colors[(int)sheepColor];
+        int idx = (int)sheepColor;
+        if (idx < colors.Length)
+            return colors[idx];
+        return Color.white;
     }
 }

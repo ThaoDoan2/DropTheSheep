@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Gameplay
 {
@@ -14,6 +14,12 @@ namespace Gameplay
 
         public Vector2Int CellPos => _cellPos;
 
+        public void Init(Vector2Int pos, Board board, SheepColor color)
+        {
+            base.Init(pos, board);
+            _color = color;
+        }
+
         public bool IsAtCell(Vector2Int pos)
         {
             return _cellPos == pos;
@@ -26,13 +32,18 @@ namespace Gameplay
             hole.OnSheepEnterHole();
         }
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
+        public void LoadData()
         {
-            base.OnValidate();
+            LoadPositionFromCellPos();
             Color color = _sheepColorConst.GetColor(_color);
 
             _renderer.color = color;
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            LoadData();
         }
 #endif
     }

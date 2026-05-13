@@ -24,6 +24,35 @@
         Block = 3,
     }
 
+    public enum HoleShape
+    {
+        Square1 = 0,
+        Horizontal2,
+        Vertical2,
+
+        Horizontal3,
+        Vertical3,
+        Corner31,
+        Corner32,
+        Corner33,
+        Corner34,
+
+        Square4,
+        Horizontal4,
+        Vertical4,
+        Corner41,
+        Corner42,
+        Corner43,
+        Corner44,
+        Corner45,
+        Corner46,
+        Corner47,
+        Corner48,
+
+
+
+    }
+
     public class GameConst
     {
     }

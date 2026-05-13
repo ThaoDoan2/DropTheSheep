@@ -145,6 +145,7 @@ MonoBehaviour:
   - {fileID: 3574730618351788410}
   _remainText: {fileID: 5878696171026379960}
   _color: 2
+  _shapeType: 12
   _shape:
   - {x: 0, y: 0}
   - {x: 1, y: 0}

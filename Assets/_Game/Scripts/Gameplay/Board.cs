@@ -1,6 +1,8 @@
 using Qutility.CustomEditor;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using static UnityEngine.LowLevelPhysics2D.PhysicsShape;
 
 namespace Gameplay
 {
@@ -11,11 +13,15 @@ namespace Gameplay
         public int rows = 9;
         public float cellSize = 1f;
 
+        public int level;
+
         Cell[,] _cells;
         [SerializeField] List<Hole> _holes = new List<Hole>();
         [SerializeField] List<Sheep> _sheeps = new List<Sheep>();
 
         [SerializeField] GameObject _cellPrefab;
+        [SerializeField] GameObject[] _holePrefabs;
+        [SerializeField] GameObject _sheepPrefab;
 
         Transform _boardRoot;
 
@@ -312,18 +318,188 @@ namespace Gameplay
 
             _sheeps.Clear();
             _holes.Clear();
+
+            if (_boardRoot != null)
+            {
+                DestroyImmediate(_boardRoot.gameObject);
+                _boardRoot = null;
+            }
+            else
+            {
+                // Find and destroy any existing board root if reference is lost
+                Transform existingRoot = transform.Find("Board");
+                if (existingRoot != null)
+                    DestroyImmediate(existingRoot.gameObject);
+            }
         }
+
+
 
         [ButtonMethod]
         public void SaveData()
         {
-            
+            LevelData data = new LevelData();
+            data.cols = cols;
+            data.rows = rows;
+            data.cellSize = cellSize;
+
+            data.holes = new List<HoleData>();
+            foreach (var hole in _holes)
+            {
+                if (hole == null) continue;
+                data.holes.Add(new HoleData()
+                {
+                    pos = hole.Pivot,
+                    color = hole.Color,
+                    shapeType = hole.ShapeType,
+                    shape = hole.Shape
+                });
+            }
+
+            data.sheeps = new List<SheepData>();
+            foreach (var sheep in _sheeps)
+            {
+                if (sheep == null) continue;
+                data.sheeps.Add(new SheepData()
+                {
+                    pos = sheep.CellPos,
+                    color = sheep.Color
+                });
+            }
+
+            data.cells = new List<CellData>();
+            if (_cells != null)
+            {
+                for (int r = 0; r < rows; r++)
+                {
+                    for (int c = 0; c < cols; c++)
+                    {
+                        if (_cells[c, r] != null)
+                        {
+                            data.cells.Add(new CellData()
+                            {
+                                pos = new Vector2Int(c, r),
+                                type = _cells[c, r].Type
+                            });
+                        }
+                    }
+                }
+            }
+
+            string json = JsonUtility.ToJson(data, true);
+            string directory = Path.Combine(Application.dataPath, "_Game/Resources", "Data");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            string path = Path.Combine(directory, $"LevelData_{level}.json");
+            File.WriteAllText(path, json);
+            Debug.Log($"[Board] - Saved to {path}");
+            UnityEditor.AssetDatabase.Refresh();
         }
+
+
 #endif
+
+        [ButtonMethod]
+        public void LoadData()
+        {
+            string jsonStr = "";
+            TextAsset jsonAsset = Resources.Load<TextAsset>($"Data/LevelData_{level}");
+            if (jsonAsset != null)
+            {
+                jsonStr = jsonAsset.text;
+            }
+            else
+            {
+                // Fallback for Editor: try reading directly from the file system if Resources.Load fails
+                string path = Path.Combine(Application.dataPath, "Resources", "Data", $"LevelData_{level}.json");
+                if (File.Exists(path))
+                {
+                    jsonStr = File.ReadAllText(path);
+                }
+                else
+                {
+                    Debug.LogError($"[Board] - Level data not found for level {level}. Expected at Resources/Data/LevelData_{level}");
+                    return;
+                }
+            }
+
+            LevelData data = JsonUtility.FromJson<LevelData>(jsonStr);
+
+            ClearBoard();
+
+            cols = data.cols;
+            rows = data.rows;
+            cellSize = data.cellSize;
+
+            BuildGrid();
+
+            foreach (var hData in data.holes)
+            {
+                GameObject go = UnityEditor.PrefabUtility.InstantiatePrefab(_holePrefabs[(int)hData.shapeType]) as GameObject;
+                go.transform.SetParent(transform);
+                Hole hole = go.GetComponent<Hole>();
+                hole.Init(hData.pos, this, hData.shape, hData.color);
+                hole.LoadData();
+                _holes.Add(hole);
+
+                // Trigger OnValidate to update position and color
+                UnityEditor.EditorUtility.SetDirty(hole);
+            }
+
+            foreach (var sData in data.sheeps)
+            {
+                GameObject go = UnityEditor.PrefabUtility.InstantiatePrefab(_sheepPrefab) as GameObject;
+                go.transform.SetParent(transform);
+                Sheep sheep = go.GetComponent<Sheep>();
+                sheep.Init(sData.pos, this, sData.color);
+                sheep.LoadData();
+                _sheeps.Add(sheep);
+
+                UnityEditor.EditorUtility.SetDirty(sheep);
+            }
+
+            LoadBoard();
+        }
 
         private static void Log(string msg)
         {
             Debug.Log($"[Board] - {msg}");
         }
+    }
+
+    [System.Serializable]
+    public class LevelData
+    {
+        public int cols;
+        public int rows;
+        public float cellSize;
+        public List<HoleData> holes;
+        public List<SheepData> sheeps;
+        public List<CellData> cells;
+    }
+
+    [System.Serializable]
+    public class HoleData
+    {
+        public Vector2Int pos;
+        public SheepColor color;
+        public HoleShape shapeType;
+        public Vector2Int[] shape;
+    }
+
+    [System.Serializable]
+    public class SheepData
+    {
+        public Vector2Int pos;
+        public SheepColor color;
+    }
+
+    [System.Serializable]
+    public class CellData
+    {
+        public Vector2Int pos;
+        public CellType type;
     }
 }

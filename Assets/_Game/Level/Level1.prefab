@@ -573,12 +573,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
-      propertyPath: m_Color.g
+      propertyPath: m_Color.b
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
+      propertyPath: m_Color.g
+      value: 0.64705884
+      objectReference: {fileID: 0}
+    - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: m_Color.r
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3092632143729953177, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: m_Name
@@ -590,7 +594,7 @@ PrefabInstance:
       objectReference: {fileID: 8623681820468391963}
     - target: {fileID: 7423016856962347448, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: _color
-      value: -1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7423016856962347448, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: _cellPos.x
@@ -880,8 +884,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: m_Color.g
-      value: 0.64705884
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1816236034671595465, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
+      propertyPath: m_Color.r
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3092632143729953177, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: m_Name
@@ -893,7 +905,7 @@ PrefabInstance:
       objectReference: {fileID: 8623681820468391963}
     - target: {fileID: 7423016856962347448, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: _color
-      value: 4
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7423016856962347448, guid: 2c216d0043b24e448af45567687ff4bb, type: 3}
       propertyPath: _cellPos.x

@@ -14,12 +14,15 @@ namespace Utils
         {
             get
             {
-                if ((Object)s_Instance == (Object)null)
+                lock (m_Lock)
                 {
-                    CreateAndLoad();
-                }
+                    if ((Object)s_Instance == (Object)null)
+                    {
+                        CreateAndLoad();
+                    }
 
-                return s_Instance;
+                    return s_Instance;
+                }
             }
         }
 
@@ -37,6 +40,7 @@ namespace Utils
 
         private static void CreateAndLoad()
         {
+
             string filePath = GetFilePath();
             if (!string.IsNullOrEmpty(filePath))
             {
@@ -80,10 +84,10 @@ namespace Utils
             object[] customAttributes = typeof(T).GetCustomAttributes(inherit: true);
             foreach (object obj in customAttributes)
             {
-                if (obj is FilePathAttribute)
-                {
-                    return (obj as FilePathAttribute).filepath;
-                }
+                //if (obj is FilePathAttribute)
+                //{
+                //    return (obj as FilePathAttribute).Get;
+                //}
             }
 
             return string.Empty;

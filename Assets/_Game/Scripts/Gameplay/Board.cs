@@ -282,6 +282,7 @@ namespace Gameplay
             return GetSheepAtCell(new Vector2Int(c, r));
         }
 
+#if UNITY_EDITOR
         [ButtonMethod]
         public void LoadBoardState()
         {
@@ -293,6 +294,32 @@ namespace Gameplay
             _holes.Clear();
             _holes.AddRange(holes);
         }
+
+        [ButtonMethod]
+        public void ClearBoard()
+        {
+            foreach (var hole in _holes)
+            {
+                if (hole != null)
+                    DestroyImmediate(hole.gameObject);
+            }
+
+            foreach (var sheep in _sheeps)
+            {
+                if (sheep != null)
+                    DestroyImmediate(sheep.gameObject);
+            }
+
+            _sheeps.Clear();
+            _holes.Clear();
+        }
+
+        [ButtonMethod]
+        public void SaveData()
+        {
+            
+        }
+#endif
 
         private static void Log(string msg)
         {

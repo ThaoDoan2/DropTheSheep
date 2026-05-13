@@ -15,13 +15,13 @@ namespace Gameplay
 
         public int level;
 
-        Cell[,] _cells;
-        [SerializeField] List<Hole> _holes = new List<Hole>();
-        [SerializeField] List<Sheep> _sheeps = new List<Sheep>();
+        protected Cell[,] _cells;
+        [SerializeField] protected List<Hole> _holes = new List<Hole>();
+        [SerializeField] protected List<Sheep> _sheeps = new List<Sheep>();
 
-        [SerializeField] GameObject _cellPrefab;
-        [SerializeField] GameObject[] _holePrefabs;
-        [SerializeField] GameObject _sheepPrefab;
+        [SerializeField] protected GameObject _cellPrefab;
+        [SerializeField] protected GameObject[] _holePrefabs;
+        [SerializeField] protected GameObject _sheepPrefab;
 
         Transform _boardRoot;
 

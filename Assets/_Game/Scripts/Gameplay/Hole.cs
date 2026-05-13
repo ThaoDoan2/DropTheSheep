@@ -28,6 +28,13 @@ namespace Gameplay
 
         public Vector2Int[] Shape => _shape;
 
+        public void Init(Vector2Int pos, Board board, HoleShape shapeType, SheepColor color)
+        {
+            base.Init(pos, board);
+            LoadShapeFromType();
+            _color = color;
+        }
+
         public void Init(Vector2Int pos, Board board, Vector2Int[] shape, SheepColor color)
         {
             base.Init(pos, board);
@@ -57,7 +64,7 @@ namespace Gameplay
             _cellPos = pos - _touchCell;
         }
 
-        public void Select(Vector2Int pos)
+        public override void Select(Vector2Int pos)
         {
             for (int i = 0; i < _shape.Length; i++)
             {

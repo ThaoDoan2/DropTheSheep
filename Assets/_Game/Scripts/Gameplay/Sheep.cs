@@ -12,7 +12,7 @@ namespace Gameplay
 
         public SheepColor Color => _color;
 
-        public Vector2Int CellPos => _cellPos;
+
 
         public void Init(Vector2Int pos, Board board, SheepColor color)
         {

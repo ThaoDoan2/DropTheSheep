@@ -12,8 +12,6 @@ namespace Gameplay
 
         public SheepColor Color => _color;
 
-
-
         public void Init(Vector2Int pos, Board board, SheepColor color)
         {
             base.Init(pos, board);

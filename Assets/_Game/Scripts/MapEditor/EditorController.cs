@@ -1,7 +1,9 @@
 ﻿
 using Gameplay;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.PlayerSettings;
 
 namespace MapEditor
 {
@@ -14,6 +16,9 @@ namespace MapEditor
         OnBoardObject _selectedHole;
         BoardEditor _board;
         OnBoardObject _insertObject;
+        OnBoardObject _touchingObj;
+        long _touchTime;
+
 
         bool Enable
         {
@@ -62,6 +67,7 @@ namespace MapEditor
         private void HandleTouchBegan(Vector3 screenPos)
         {
             Log($"HandleTouchBegan {screenPos}");
+            _touchTime = DateTime.Now.Ticks;
 
             var pos = _camera.ScreenToWorldPoint(screenPos);
             pos.z = 0;
@@ -72,8 +78,17 @@ namespace MapEditor
                 if (_board == null)
                 {
                     _board = FindAnyObjectByType<BoardEditor>();
-                    _board.InsertObject(hole, pos);
                 }
+                _board.ChangeStateNormal();
+                _touchingObj = hole;
+            }
+            else if (hit.collider != null && hit.collider.TryGetComponent<Sheep>(out var sheep))
+            {
+                if (_board == null)
+                {
+                    _board = FindAnyObjectByType<BoardEditor>();
+                }
+                _touchingObj = sheep;
             }
             else if (hit.collider != null && hit.collider.TryGetComponent<BoardEditor>(out var board))
             {
@@ -89,6 +104,33 @@ namespace MapEditor
             pos.z = 0;
 
             _board?.OnTouchMove(pos);
+
+            var hit = Physics2D.Raycast(pos, Vector2.zero);
+            if (hit.collider != null && hit.collider.TryGetComponent<Hole>(out var hole))
+            {
+                if (_board == null)
+                {
+                    _board = FindAnyObjectByType<BoardEditor>();
+                }
+                if (_touchingObj == hole && GetTouchMilisecond() > 100)
+                {
+                    _touchingObj = null;
+                    _board.InsertObject(hole, pos);
+                }
+            }
+            else if (hit.collider != null && hit.collider.TryGetComponent<Sheep>(out var sheep))
+            {
+                if (_board == null)
+                {
+                    _board = FindAnyObjectByType<BoardEditor>();
+                }
+
+                if (_touchingObj == sheep && GetTouchMilisecond() > 100)
+                {
+                    _touchingObj = null;
+                    _board.InsertObject(sheep, pos);
+                }
+            }
         }
 
         private void HandleTouchEnded(Vector3 screenPos)
@@ -96,8 +138,41 @@ namespace MapEditor
             var pos = _camera.ScreenToWorldPoint(screenPos);
             pos.z = 0;
 
+            long miliseconds = GetTouchMilisecond();
+            if (miliseconds < 100)
+            {
+                OnClick(pos);
+            }
+
             _board?.OnTouchEnd(pos);
             _board = null;
+            _touchingObj = null;
+        }
+
+        private long GetTouchMilisecond()
+        {
+            long touchDuration = DateTime.Now.Ticks - _touchTime;
+            long miliseconds = touchDuration / TimeSpan.TicksPerMillisecond;
+            return miliseconds;
+        }
+
+        private void OnClick(Vector3 pos)
+        {
+            var hit = Physics2D.Raycast(pos, Vector2.zero);
+            if (hit.collider != null && hit.collider.TryGetComponent<Sheep>(out var sheep))
+            {
+                if (_board == null)
+                {
+                    _board = FindAnyObjectByType<BoardEditor>();
+                }
+                _board.OnClickSheep();
+            }
+            else if (hit.collider != null && hit.collider.TryGetComponent<BoardEditor>(out var board))
+            {
+                Debug.Log($"OnClick Board");
+                board.OnClick(pos);
+                _board = board;
+            }
         }
 
         static void Log(string msg)

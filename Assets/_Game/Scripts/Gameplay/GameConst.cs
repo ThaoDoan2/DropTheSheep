@@ -32,15 +32,15 @@
 
         Horizontal3,
         Vertical3,
-        Corner31,
-        Corner32,
+        Corner31, //|_
+        Corner32, 
         Corner33,
         Corner34,
 
         Square4,
         Horizontal4,
         Vertical4,
-        Corner41,
+        Corner41, // L
         Corner42,
         Corner43,
         Corner44,

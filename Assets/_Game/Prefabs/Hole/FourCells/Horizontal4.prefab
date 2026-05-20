@@ -236,7 +236,7 @@ MonoBehaviour:
   - {fileID: 2828071756475012144}
   _remainText: {fileID: 8043031250554236737}
   _color: 2
-  _shapeType: 0
+  _shapeType: 10
   _shape:
   - {x: 0, y: 0}
   - {x: 1, y: 0}

@@ -42,6 +42,17 @@ namespace Gameplay
             _color = color;
         }
 
+        public void SetColor(SheepColor color)
+        {
+            _color = color;
+
+            Color c = GameplaySO.instance.GetColor(_color);
+            foreach (var renderer in _renderers)
+            {
+                renderer.color = c;
+            }
+        }
+
         private void Start()
         {
             remain = _shape.Length;
@@ -233,6 +244,106 @@ namespace Gameplay
                     _shape = new Vector2Int[] { Vector2Int.zero, Vector2Int.up, new(1, 1), new(2, 1) };
                     break;
             }
+        }
+
+        public static HoleShape GetNextShape(HoleShape shape)
+        {
+            switch (shape)
+            {
+                case HoleShape.Horizontal2:
+                    return HoleShape.Vertical2;
+                case HoleShape.Vertical2:
+                    return HoleShape.Horizontal2;
+
+                case HoleShape.Horizontal3:
+                    return HoleShape.Vertical3;
+                case HoleShape.Vertical3:
+                    return HoleShape.Horizontal3;
+
+                case HoleShape.Corner31:
+                    return HoleShape.Corner32;
+                case HoleShape.Corner32:
+                    return HoleShape.Corner33;
+                case HoleShape.Corner33:
+                    return HoleShape.Corner34;
+                case HoleShape.Corner34:
+                    return HoleShape.Corner31;
+
+                case HoleShape.Horizontal4:
+                    return HoleShape.Vertical4;
+                case HoleShape.Vertical4:
+                    return HoleShape.Horizontal4;
+
+                case HoleShape.Corner41:
+                    return HoleShape.Corner46;
+                case HoleShape.Corner46:
+                    return HoleShape.Corner43;
+                case HoleShape.Corner43:
+                    return HoleShape.Corner48;
+                case HoleShape.Corner48:
+                    return HoleShape.Corner41;
+
+                case HoleShape.Corner42:
+                    return HoleShape.Corner47;
+                case HoleShape.Corner47:
+                    return HoleShape.Corner44;
+                case HoleShape.Corner44:
+                    return HoleShape.Corner45;
+                case HoleShape.Corner45:
+                    return HoleShape.Corner42;
+
+            }
+            return shape;
+        }
+
+        public static HoleShape GetPrevShape(HoleShape shape)
+        {
+            switch (shape)
+            {
+                case HoleShape.Horizontal2:
+                    return HoleShape.Vertical2;
+                case HoleShape.Vertical2:
+                    return HoleShape.Horizontal2;
+
+                case HoleShape.Horizontal3:
+                    return HoleShape.Vertical3;
+                case HoleShape.Vertical3:
+                    return HoleShape.Horizontal3;
+
+                case HoleShape.Corner31:
+                    return HoleShape.Corner34;
+                case HoleShape.Corner34:
+                    return HoleShape.Corner33;
+                case HoleShape.Corner33:
+                    return HoleShape.Corner32;
+                case HoleShape.Corner32:
+                    return HoleShape.Corner31;
+
+                case HoleShape.Horizontal4:
+                    return HoleShape.Vertical4;
+                case HoleShape.Vertical4:
+                    return HoleShape.Horizontal4;
+
+                case HoleShape.Corner41:
+                    return HoleShape.Corner48;
+                case HoleShape.Corner48:
+                    return HoleShape.Corner43;
+                case HoleShape.Corner43:
+                    return HoleShape.Corner46;
+                case HoleShape.Corner46:
+                    return HoleShape.Corner41;
+
+                case HoleShape.Corner47:
+                    return HoleShape.Corner42;
+                case HoleShape.Corner44:
+                    return HoleShape.Corner47;
+                case HoleShape.Corner45:
+                    return HoleShape.Corner44;
+                case HoleShape.Corner42:
+                    return HoleShape.Corner45;
+
+            }
+            return shape;
         }
     }
 }

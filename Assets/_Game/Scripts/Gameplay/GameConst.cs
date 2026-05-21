@@ -22,6 +22,7 @@
         Sheep = 1,
         Hole = 2, 
         Block = 3,
+        Void = 4,
     }
 
     public enum HoleShape

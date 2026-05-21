@@ -1,4 +1,5 @@
 using Qutility.CustomEditor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -47,10 +48,10 @@ namespace Gameplay
                 {
                     var go = Instantiate(_cellPrefab);
                     go.name = $"Cell_{c}_{r}";
-                    go.transform.localPosition = GridToWorld(c, r);
                     var cell = go.GetComponent<Cell>();
                     cell.Init(c, r);
-                    cell.transform.SetParent(_boardRoot);
+                    go.transform.SetParent(_boardRoot);
+                    go.transform.localPosition = GridToWorld(c, r);
                     _cells[c, r] = cell;
 
                     bool left = c > 0;
@@ -223,7 +224,7 @@ namespace Gameplay
                 if (newShape[i].x < 0 || newShape[i].x >= cols || newShape[i].y < 0 || newShape[i].y >= rows)
                     return false;
                 Cell cell = _cells[newShape[i].x, newShape[i].y];
-                if (cell.Type == CellType.Block)
+                if (cell.Type == CellType.Block || cell.Type == CellType.Void)
                     return false;
                 if (cell.Type == CellType.Hole)
                 {
@@ -374,7 +375,7 @@ namespace Gameplay
                 {
                     for (int c = 0; c < cols; c++)
                     {
-                        if (_cells[c, r] != null)
+                        if (_cells[c, r] != null && (_cells[c, r].Type == CellType.Block) || _cells[c, r].Type == CellType.Void)
                         {
                             data.cells.Add(new CellData()
                             {
@@ -460,7 +461,44 @@ namespace Gameplay
                 UnityEditor.EditorUtility.SetDirty(sheep);
             }
 
+            foreach (var cData in data.cells)
+            {
+                if (cData.type == CellType.Void)
+                    _cells[cData.pos.x, cData.pos.y].Type = CellType.Void;
+            }
+
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    if (_cells[c, r].Type != CellType.Void)
+                        RenderCell(new Vector2Int(c, r));
+                    else _cells[c, r].OnRemoved();
+                }
+            }
+
+            UpdateCamera();
             LoadBoard();
+        }
+
+        void UpdateCamera()
+        {
+            Camera.main.orthographicSize = cols + 1;
+        }
+
+        protected void RenderCell(Vector2Int cellPos)
+        {
+            Cell cell = _cells[cellPos.x, cellPos.y];
+
+            if (cell.Type == CellType.Void)
+                return;
+
+            bool top = cellPos.y < rows - 1 && _cells[cellPos.x, cellPos.y + 1].Type != CellType.Void;
+            bool bottom = cellPos.y > 0 && _cells[cellPos.x, cellPos.y - 1].Type != CellType.Void;
+            bool left = cellPos.x > 0 && _cells[cellPos.x - 1, cellPos.y].Type != CellType.Void;
+            bool right = cellPos.x < cols - 1 && _cells[cellPos.x + 1, cellPos.y].Type != CellType.Void;
+
+            cell.UpdateCell(left, top, right, bottom);
         }
 
         private static void Log(string msg)

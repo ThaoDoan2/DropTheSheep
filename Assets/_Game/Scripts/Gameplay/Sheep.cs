@@ -38,6 +38,13 @@ namespace Gameplay
             _renderer.color = color;
         }
 
+        public void SetColor(SheepColor color)
+        {
+            _color = color;
+            Color c = _sheepColorConst.GetColor(_color);
+            _renderer.color = c;
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {

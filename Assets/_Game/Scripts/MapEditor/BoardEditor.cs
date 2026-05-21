@@ -15,6 +15,8 @@ namespace MapEditor
 
         [SerializeField] MapEditorState _state;
 
+        bool _removeDraggingObject = false;
+
         public SheepColor CurrentColor { get => _currentColor; set => _currentColor = value; }
 
         private void Start()
@@ -49,10 +51,10 @@ namespace MapEditor
                 {
                     var go = Instantiate(_cellPrefab);
                     go.name = $"Cell_{c}_{r}";
-                    go.transform.localPosition = GridToWorld(c, r);
                     var cell = go.GetComponent<Cell>();
                     cell.Init(c, r);
-                    cell.transform.SetParent(_boardRoot);
+                    go.transform.SetParent(_boardRoot);
+                    go.transform.localPosition = GridToWorld(c, r);
                     _cells[c, r] = cell;
 
                     bool left = c > 0;
@@ -140,7 +142,7 @@ namespace MapEditor
                 if (newShape[i].x < 0 || newShape[i].x >= cols || newShape[i].y < 0 || newShape[i].y >= rows)
                     return false;
                 Cell cell = _cells[newShape[i].x, newShape[i].y];
-                if (cell.Type == CellType.Block)
+                if (cell.Type == CellType.Block || cell.Type == CellType.Void)
                     return false;
                 if (cell.Type == CellType.Hole || cell.Type == CellType.Sheep)
                 {
@@ -158,6 +160,10 @@ namespace MapEditor
             {
                 _holes.Remove(obj as Hole);
             }
+            if (obj is Sheep)
+            {
+                _sheeps.Remove(obj as Sheep);
+            }
         }
 
         public void OnTouchBegan(Vector3 pos)
@@ -173,29 +179,27 @@ namespace MapEditor
             {
                 _draggingObject = obj;
                 _selectedObject = obj;
-                _selectedObject.Select(cellPos);
+                _draggingObject.Select(cellPos);
                 Log($"Selected hole at cell {cellPos}");
-
-                RemoveSelectedObject(obj);
-
-                if (_menu != null)
-                {
-                    if (obj is Hole)
-                        _menu.SelectHole(obj as Hole);
-                }
             }
         }
 
         public void OnTouchMove(Vector3 pos)
         {
-            if (_draggingObject == null) 
+            if (_draggingObject == null)
                 return;
+
+            if (!_removeDraggingObject)
+            {
+                _removeDraggingObject = true;
+                RemoveSelectedObject(_draggingObject);
+            }
 
             Vector3 localPos = transform.InverseTransformPoint(pos);
             Vector2Int cellPos = FromLocalToGrid(localPos);
 
             Log($"OnTouchMove cellPos {cellPos}");
-            MoveHoleToCell(_selectedObject, cellPos);
+            MoveHoleToCell(_draggingObject, cellPos);
         }
 
         public void OnTouchEnd(Vector3 pos)
@@ -206,9 +210,9 @@ namespace MapEditor
             Vector3 localPos = transform.InverseTransformPoint(pos);
             Vector2Int cellPos = FromLocalToGrid(localPos);
 
-            MoveAndAddHoleToCell(_selectedObject, cellPos);
-            _selectedObject = null;
+            MoveAndAddHoleToCell(_draggingObject, cellPos);
             _draggingObject = null;
+            _removeDraggingObject = false;
         }
 
         public void OnClick(Vector3 pos)
@@ -219,7 +223,55 @@ namespace MapEditor
             if (_state == MapEditorState.InsertSheep)
             {
                 InsertSheep(cellPos);
+                return;
             }
+            else if (_state == MapEditorState.RemoveSheep)
+            {
+                var obj = GetObjectAtCell(cellPos);
+                if (obj != null)
+                {
+                    RemoveSelectedObject(obj);
+                    Destroy(obj.gameObject);
+                }
+                return;
+            }
+            else if (_state == MapEditorState.RemoveCell)
+            {
+                if (cellPos.x < 0 || cellPos.x >= cols || cellPos.y < 0 || cellPos.y >= rows)
+                    return;
+                OnRemoveCell(cellPos);
+            }
+            else if (_state == MapEditorState.InsertCell && _cells[cellPos.x, cellPos.y].Type == CellType.Void)
+            {
+                if (cellPos.x < 0 || cellPos.x >= cols || cellPos.y < 0 || cellPos.y >= rows)
+                    return;
+                _cells[cellPos.x, cellPos.y].Type = CellType.Empty;
+            }
+
+            OnBoardObject onBoardObject = GetObjectAtCell(cellPos);
+            if (_menu != null)
+            {
+                if (onBoardObject is Hole)
+                    _menu.SelectHole(onBoardObject as Hole);
+                else if (onBoardObject is Sheep)
+                    _menu.SelectSheep(onBoardObject as Sheep);
+            }
+        }
+
+        void OnRemoveCell(Vector2Int cellPos)
+        {
+            Cell cell = _cells[cellPos.x, cellPos.y];
+            cell.Type = CellType.Void;
+            cell.OnRemoved();
+
+            if (cellPos.x > 0)
+                RenderCell(new Vector2Int(cellPos.x - 1, cellPos.y));
+            if (cellPos.x < cols - 1)
+                RenderCell(new Vector2Int(cellPos.x + 1, cellPos.y));
+            if (cellPos.y > 0)
+                RenderCell(new Vector2Int(cellPos.x, cellPos.y - 1));
+            if (cellPos.y < rows - 1)
+                RenderCell(new Vector2Int(cellPos.x, cellPos.y + 1));
         }
 
         public void MoveHoleToCell(OnBoardObject hole, Vector2Int cellPos)
@@ -249,9 +301,6 @@ namespace MapEditor
 
         public void MoveAndAddHoleToCell(OnBoardObject obj, Vector2Int cellPos)
         {
-            if (cellPos.x < 0 || cellPos.x >= cols || cellPos.y < 0 || cellPos.y >= rows)
-                return;
-
             if (cellPos != _selectedObject.CellPos)
             {
                 var direction = cellPos - _selectedObject.CellPos;
@@ -300,6 +349,10 @@ namespace MapEditor
 
         public void InsertSheep(Vector2Int cellPos)
         {
+            var obj = GetObjectAtCell(cellPos);
+            if (obj != null)
+                return;
+
             GameObject go = UnityEditor.PrefabUtility.InstantiatePrefab(_sheepPrefab) as GameObject;
             go.transform.SetParent(transform);
             Sheep sheep = go.GetComponent<Sheep>();
@@ -363,7 +416,7 @@ namespace MapEditor
             var newHole = ReplaceHole(h, shapeType);
             if (_menu != null)
             {
-                    _menu.SelectHole(newHole);
+                _menu.SelectHole(newHole);
             }
         }
 
@@ -395,11 +448,37 @@ namespace MapEditor
         {
             Debug.Log("Insert Sheep");
             _state = MapEditorState.InsertSheep;
+            _selectedObject = null;
+
+            _menu.OnUnselectHole();
+            _menu.OnUpdateBoardState(_state);
+        }
+
+        public void ChangeStateRemoveObject()
+        {
+            Log("ChangeStateRemoveObject");
+            _state = MapEditorState.RemoveSheep;
+            _menu.OnUpdateBoardState(_state);
+        }
+
+        public void ChangeStateRemoveCell()
+        {
+            Log("ChangeStateRemoveCell");
+            _state = MapEditorState.RemoveCell;
+            _menu.OnUpdateBoardState(_state);
+        }
+
+        public void ChangeStateAddCell()
+        {
+            Log("ChangeStateAddCell");
+            _state = MapEditorState.InsertCell;
+            _menu.OnUpdateBoardState(_state);
         }
 
         public void ChangeStateNormal()
         {
             _state = MapEditorState.Normal;
+            _menu.OnUpdateBoardState(_state);
         }
     }
 }

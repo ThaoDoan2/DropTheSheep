@@ -18,6 +18,7 @@ namespace MapEditor
         OnBoardObject _insertObject;
         OnBoardObject _touchingObj;
         long _touchTime;
+        const int DRAG_THRESHOLD = 150; // milisecond
 
 
         bool Enable
@@ -103,8 +104,7 @@ namespace MapEditor
             var pos = _camera.ScreenToWorldPoint(screenPos);
             pos.z = 0;
 
-            _board?.OnTouchMove(pos);
-
+            long touchDuration = GetTouchMilisecond();
             var hit = Physics2D.Raycast(pos, Vector2.zero);
             if (hit.collider != null && hit.collider.TryGetComponent<Hole>(out var hole))
             {
@@ -112,7 +112,7 @@ namespace MapEditor
                 {
                     _board = FindAnyObjectByType<BoardEditor>();
                 }
-                if (_touchingObj == hole && GetTouchMilisecond() > 100)
+                if (_touchingObj == hole && touchDuration > DRAG_THRESHOLD)
                 {
                     _touchingObj = null;
                     _board.InsertObject(hole, pos);
@@ -125,12 +125,18 @@ namespace MapEditor
                     _board = FindAnyObjectByType<BoardEditor>();
                 }
 
-                if (_touchingObj == sheep && GetTouchMilisecond() > 100)
+                if (_touchingObj == sheep && touchDuration > DRAG_THRESHOLD)
                 {
                     _touchingObj = null;
                     _board.InsertObject(sheep, pos);
                 }
             }
+
+            if (touchDuration > DRAG_THRESHOLD)
+            {
+                _board?.OnTouchMove(pos);
+            }
+
         }
 
         private void HandleTouchEnded(Vector3 screenPos)
@@ -139,12 +145,15 @@ namespace MapEditor
             pos.z = 0;
 
             long miliseconds = GetTouchMilisecond();
-            if (miliseconds < 100)
+            if (miliseconds <= DRAG_THRESHOLD)
             {
                 OnClick(pos);
             }
+            else
+            {
+                _board?.OnTouchEnd(pos);
+            }
 
-            _board?.OnTouchEnd(pos);
             _board = null;
             _touchingObj = null;
         }
@@ -172,6 +181,26 @@ namespace MapEditor
                 Debug.Log($"OnClick Board");
                 board.OnClick(pos);
                 _board = board;
+            }
+            else if (hit.collider != null)
+            {
+                if (_board == null)
+                {
+                    _board = FindAnyObjectByType<BoardEditor>();
+                }
+                if (hit.collider.gameObject.CompareTag("RemoveObject"))
+                {
+                    _board.ChangeStateRemoveObject();
+                }
+                else if (hit.collider.gameObject.CompareTag("RemoveCell"))
+                {
+                    _board.ChangeStateRemoveCell();
+                }
+                else if (hit.collider.gameObject.CompareTag("InsertCell"))
+                {
+                    _board.ChangeStateAddCell();
+                }
+
             }
         }
 

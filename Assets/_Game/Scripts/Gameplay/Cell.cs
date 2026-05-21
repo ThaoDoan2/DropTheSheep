@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
+    [SerializeField] SpriteRenderer _center;
     [SerializeField] SpriteRenderer _tf, _tr, _bl, _br;
     [SerializeField] SpriteRenderer _top, _bottom, _left, _right;
     [SerializeField] SpriteRenderer _horizontalCell, _verticalCell;
@@ -27,6 +28,7 @@ public class Cell : MonoBehaviour
 
     public void UpdateCell(bool left, bool top, bool right, bool bottom)
     {
+        _center.gameObject.SetActive(true);
         int t = (left ? 1 <<  3 : 0) ^ (top ? 1 << 2 : 0) ^ (right ? 1 << 1 : 0) ^ (bottom ? 1 : 0);
         switch (t)
         {
@@ -180,6 +182,12 @@ public class Cell : MonoBehaviour
     void UpdateVerticalCell()
     {
         _verticalCell.gameObject.SetActive(true);
+    }
+
+    public void OnRemoved()
+    {
+        _center.gameObject.SetActive(false);
+        HideAllElement();
     }
 }
 

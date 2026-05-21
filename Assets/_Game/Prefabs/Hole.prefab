@@ -140,9 +140,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Hole
   _cellPos: {x: 0, y: 0}
   _board: {fileID: 0}
-  _renderers: []
+  _renderers:
+  - {fileID: 1816236034671595465}
   _remainText: {fileID: 5878696171026379960}
   _color: 2
+  _shapeType: 0
   _shape:
   - {x: 0, y: 0}
 --- !u!1 &3530315816454547364
@@ -224,10 +226,10 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.18, g: 0.48, b: 0.95, a: 1}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

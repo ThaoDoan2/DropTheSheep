@@ -16,7 +16,9 @@ public class MapEditorMenu : MonoBehaviour
 
     [SerializeField] BoardEditor _boardEditor;
     [SerializeField] Hole _selectedHole;
+    [SerializeField] Sheep _selectedSheep;
 
+    [SerializeField] SpriteRenderer _insertSheepSprite, _removeSheepSprite, _removeCellSprite, _insertCellSprite;
 
     private void Start()
     {
@@ -24,6 +26,8 @@ public class MapEditorMenu : MonoBehaviour
         _nextButton.onClick.AddListener(OnNext);
         _prevButton.onClick.AddListener(OnPrev);
         InitColorDropdown();
+
+        OnUpdateBoardState(MapEditorState.Normal);
     }
 
     private void InitColorDropdown()
@@ -45,10 +49,14 @@ public class MapEditorMenu : MonoBehaviour
         string colorName = _colorDropdown.options[index].text;
         _boardEditor.CurrentColor = (SheepColor)Enum.Parse(typeof(SheepColor), colorName);
 
+        SheepColor color = (SheepColor)Enum.Parse(typeof(SheepColor), colorName);
         if (_selectedHole != null)
         {
-            SheepColor color = (SheepColor)Enum.Parse(typeof(SheepColor), colorName);
             _selectedHole.SetColor(color);
+        } 
+        if (_selectedSheep != null)
+        {
+            _selectedSheep.SetColor(color);
         }
     }
 
@@ -60,10 +68,29 @@ public class MapEditorMenu : MonoBehaviour
         _boardEditor.UpdateBoardSize(col, row);
     }
 
+    public void OnUnselectHole()
+    {
+        _selectedHole = null;
+        _selectedSheep = null;
+    }
+
     public void SelectHole(Hole h)
     {
         _selectedHole = h;
+        _selectedSheep = null;
         _colorDropdown.value = (int)h.Color;
+        _nextButton.gameObject.SetActive(true);
+        _prevButton.gameObject.SetActive(true);
+    }
+
+    public void SelectSheep(Sheep sheep)
+    {
+        _selectedHole = null;
+        _selectedSheep = sheep;
+        _colorDropdown.value = (int)sheep.Color;
+
+        _nextButton.gameObject.SetActive(false);
+        _prevButton.gameObject.SetActive(false);
     }
 
     private void OnNext()
@@ -80,5 +107,13 @@ public class MapEditorMenu : MonoBehaviour
             return;
 
         _boardEditor.PrevHole(_selectedHole);
+    }
+
+    public void OnUpdateBoardState(MapEditorState state)
+    {
+        _insertSheepSprite.gameObject.SetActive(state == MapEditorState.InsertSheep);
+        _removeSheepSprite.gameObject.SetActive(state == MapEditorState.RemoveSheep);
+        _removeCellSprite.gameObject.SetActive(state == MapEditorState.RemoveCell);
+        _insertCellSprite.gameObject.SetActive(state == MapEditorState.InsertCell);
     }
 }

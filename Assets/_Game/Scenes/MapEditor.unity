@@ -1072,7 +1072,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2740410207891231356, guid: 3b21fa26f96dd154084fdb8942d24727, type: 3}
       propertyPath: m_Name
-      value: Board
+      value: BoardEditor
       objectReference: {fileID: 0}
     - target: {fileID: 6135132663497167756, guid: 3b21fa26f96dd154084fdb8942d24727, type: 3}
       propertyPath: _holes.Array.size

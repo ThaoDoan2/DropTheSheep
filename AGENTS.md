@@ -2,7 +2,7 @@
 - Project name: DropTheSheep2
 - Unity version: Unity 6000.4.1f1
 - Active game object:
-  - Name: Cell
+  - Name: InGameHUD
   - Tag: Untagged
-  - Layer: Default
+  - Layer: UI
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

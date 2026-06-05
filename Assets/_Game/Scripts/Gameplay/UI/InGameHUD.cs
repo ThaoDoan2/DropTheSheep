@@ -20,6 +20,13 @@ namespace Gameplay.UI
                 Value = 2
             };
             _levelStringEvent.StringReference["Level"] = levelVariable;
+
+            GameManager.Instance.SetHUD(this);
+        }
+
+        public void UpdateTimeLeft(int seconds)
+        {
+            _timeText.text = StringUtility.ConvertIntToTimeStr(seconds);
         }
     }
 }

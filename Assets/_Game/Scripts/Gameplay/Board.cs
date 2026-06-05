@@ -30,8 +30,13 @@ namespace Gameplay
 
         private void Start()
         {
-            BuildGrid();
-            LoadBoard();
+            //BuildGrid();
+            //LoadBoard();
+
+            GameManager.Instance.SetBoard(this);
+
+            level = GameManager.Instance.Data.Level;
+            LoadData();
         }
 
         private void BuildGrid()
@@ -119,6 +124,8 @@ namespace Gameplay
                 _selectedHole.Select(cellPos);
                 Log($"Selected hole at cell {cellPos}");
             }
+
+            GameManager.Instance.OnTouchBegan();
         }
 
         public void OnTouchMove(Vector3 pos)

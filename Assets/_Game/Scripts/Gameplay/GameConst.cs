@@ -49,12 +49,12 @@
         Corner46,
         Corner47,
         Corner48,
-
-
-
     }
 
-    public class GameConst
+    public static class GameConst
     {
+        public const int MAX_LIFE = 5;
+        public const int REGEN_TIME = 30 * 60; //30 mins
+
     }
 }

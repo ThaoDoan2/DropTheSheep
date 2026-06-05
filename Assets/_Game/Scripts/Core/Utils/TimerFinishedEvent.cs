@@ -1,0 +1,8 @@
+using UnityEngine.Events;
+
+/// <summary>
+/// An event for when a timer has finished
+/// </summary>
+public class TimerFinishedEvent : UnityEvent
+{
+}
